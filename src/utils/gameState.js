@@ -28,12 +28,14 @@ export const saveGameState = (newState) => {
 };
 
 export const getGameState = () => {
+    let gameState = undefined;
     if (currentState) {
-        return currentState;
+        gameState = currentState;
     } else {
         // persistent state
-        return loadSavedGameState();
+        gameState = loadSavedGameState();
     }
+    return gameState;
 };
 
 export const setGameState = (newState) => {

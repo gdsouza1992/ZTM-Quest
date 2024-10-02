@@ -18,20 +18,22 @@ export function makePlayer(playerProps = {}, customScale = scaleFactor) {
         });
     }
 
+    const gameState = getGameState();
     const playerState = {
-        set: function (target, key, value) {
+        ...gameState.player
+    }
+    const handler = {
+        set(target, prop, value) {
+            target[prop] = value;
             const gameState = getGameState();
-            gameState.player[key] = value;
+            gameState.player[prop] = value;
             setGameState(gameState);
             return true;
-        },
+        }
     };
-    const state = new Proxy(
-        {
-            ...playerProps,
-        },
-        playerState
-    );
+
+    // Changes made to the proxy will also trigger the custom setter.
+    const proxiedState = new Proxy(playerState, handler);
 
     const player = k.make([
         k.sprite('player', { anim: 'idle-down' }),
@@ -43,12 +45,12 @@ export function makePlayer(playerProps = {}, customScale = scaleFactor) {
         k.pos(),
         k.scale(customScale),
         {
-            speed: speedByScaleFactor,
+            speed: 2 * speedByScaleFactor,
             direction: 'down',
             isInDialog: false,
             collectedCoins: 0,
             score: 0,
-            state: state,
+            state: proxiedState,
         },
     ]);
 
